@@ -1,0 +1,1 @@
+docker-compose --project-name apache-pinot-starter down
