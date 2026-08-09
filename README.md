@@ -1,40 +1,77 @@
-### Run the following command to launch all the containers
+# Apache Pinot Starter
+
+Spin up a complete [Apache Pinot](https://pinot.apache.org/) cluster with real-time Kafka ingestion — one command, fully containerized.
+
+**What you get:**
+
+| Service | Image | Port |
+| --- | --- | --- |
+| Pinot Controller | `apachepinot/pinot:0.12.0` | `9000` (web UI) |
+| Pinot Broker | `apachepinot/pinot:0.12.0` | `8099` |
+| Pinot Server | `apachepinot/pinot:0.12.0` | `8098` |
+| Kafka | `wurstmeister/kafka` | `9090` |
+| Zookeeper | `zookeeper:3.5.6` | `2181` |
+
+Includes a ready-made `transcript` example: schema, table config, and sample data for a realtime table ingesting from a Kafka topic.
+
+## Prerequisites
+
+- Docker with Docker Compose
+- Enough memory for the JVM heaps (the server is configured with up to 16 GB `-Xmx`; lower the `JAVA_OPTS` in `docker-compose.yml` for smaller machines)
+
+## Quickstart
+
+**1. Launch the cluster**
 
 ```bash
 . start.sh
 ```
 
-### Run the following command to stop the containers
+Wait for the containers to come up, then open the Pinot UI at [http://localhost:9000](http://localhost:9000).
 
-```bash
-. stop.sh
-```
-
-### Create a Kafka Topic
+**2. Create the Kafka topic**
 
 ```bash
 . run.sh; createTopic
 ```
 
-### Upload schema and table
+Creates `transcript-topic` (pass a name to override: `createTopic my-topic`).
+
+**3. Create the schema and table**
 
 ```bash
 . run.sh; createTable
 ```
 
-### Publish messages to the target topic
+Registers the `transcript` schema and realtime table from [static/schema](static/schema) and [static/table](static/table).
+
+**4. Publish sample messages**
 
 ```bash
 . run.sh; publishMessages
 ```
 
-### Query the Table
+Streams [static/data/transcript.json](static/data) into the topic — Pinot ingests it in real time.
+
+**5. Query the table**
 
 ```bash
 . run.sh; query
 ```
 
-# Apache Pinot
+Runs `SELECT * FROM transcript` through the broker. Pass your own SQL: `query "SELECT studentID, AVG(score) FROM transcript GROUP BY studentID"`. You can also query interactively in the [Pinot UI](http://localhost:9000/#/query).
+
+**6. Tear down**
+
+```bash
+. stop.sh
+```
+
+---
+
+# Pinot Concepts & Architecture Notes
+
+Reference notes condensed from the [Apache Pinot documentation](https://docs.pinot.apache.org/).
 
 ## Table of Contents
 
